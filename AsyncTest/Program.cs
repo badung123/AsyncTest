@@ -7,44 +7,38 @@ namespace AsyncTest
 {
     class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
-            DisplayCurrentInfoAsync();
-        }
-        public static async Task<int> GetUrlContentLengthAsync()
-        {
-            var client = new HttpClient();
-
-            Task<string> getStringTask =
-                client.GetStringAsync("https://docs.microsoft.com/dotnet");
-
-            DoIndependentWork();
-
-            string contents = await getStringTask;
-
-            return contents.Length;
+            var t = DisplayCurrentInfoAsync();
+            t.GetAwaiter().GetResult();
         }
 
-        static void DoIndependentWork()
-        {
-            Console.WriteLine("Working...");
-        }
         public static async Task DisplayCurrentInfoAsync()
         {
-            await WaitAndApologizeAsync();
+            var t1 = WaitAndApologizeAsync();
+            var t2 = WaitAndApologizeAsync2();
+
+            await Task.WhenAll(t1, t2);
+
 
             Console.WriteLine($"Today is {DateTime.Now:D}");
+            await Task.Delay(1000);
             Console.WriteLine($"The current time is {DateTime.Now.TimeOfDay:t}");
             Console.WriteLine("The current temperature is 76 degrees.");
         }
 
         public static async Task WaitAndApologizeAsync()
         {
-            await Task.Delay(2000);
+            await Task.Delay(5000);
 
             Console.WriteLine("Sorry for the delay...\n");
+        }
+        public static async Task WaitAndApologizeAsync2()
+        {
+            await Task.Delay(6000);
 
+            Console.WriteLine("Sorry again for the delay...\n");
         }
     }
 }
